@@ -39,7 +39,7 @@ public class ParrotRepository implements CrudRepository<Parrot> {
         try (Connection connection = getConnection()) {
             // todo
             String query =String.format(Locale.US,"INSERT INTO parrot (color, weight) VALUES ('%s', %f);", parrot.getColor(), parrot.getWeight());
-            connection.createStatement().executeUpdate(query);
+            connection.createStatement().execute(query);
 
 //            String query = "INSERT INTO parrot (color, weight) VALUES (?, ?)";
 //            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -119,7 +119,7 @@ public class ParrotRepository implements CrudRepository<Parrot> {
             // DELETE FROM `parrot` WHERE (`id` = '5');
 
             String query = String.format("DELETE FROM parrot WHERE (id = %d);", id);
-            connection.createStatement().executeUpdate(query);
+            connection.createStatement().execute(query);
 
         } catch (Exception e) {
             throw new RuntimeException(e);
