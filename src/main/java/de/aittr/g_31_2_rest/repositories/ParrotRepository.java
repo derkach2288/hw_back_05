@@ -38,19 +38,32 @@ public class ParrotRepository implements CrudRepository<Parrot> {
     public Parrot save(Parrot parrot) {
         try (Connection connection = getConnection()) {
             // todo
-            String query =String.format(Locale.US,"INSERT INTO parrot (color, weight) VALUES ('%s', %f);", parrot.getColor(), parrot.getWeight());
-            connection.createStatement().execute(query);
+            String query = String.format(Locale.US, "INSERT INTO parrot (color, weight) VALUES ('%s', %f);", parrot.getColor(), parrot.getWeight());
+            Statement statement = connection.createStatement();
+            if (statement.execute(query, Statement.RETURN_GENERATED_KEYS)) {
+                ResultSet generatedKeys = statement.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    int generatedId = generatedKeys.getInt(ID);
+                    parrot.setId(generatedId);
+                    return parrot;
+                }
+            }
 
-//            String query = "INSERT INTO parrot (color, weight) VALUES (?, ?)";
-//            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-//                preparedStatement.setString(1, parrot.getColor());
-//                preparedStatement.setDouble(2, parrot.getWeight());
-//                preparedStatement.executeUpdate();
-//            } catch (SQLException e) {
-//                throw new RuntimeException(e);
+            return null;
+            //-----------------------
+
+//            int rowsAffected = statement.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
+//
+//            if (rowsAffected > 0) {
+//                ResultSet generatedKeys = statement.getGeneratedKeys();
+//                if (generatedKeys.next()) {
+//                    int generatedId = generatedKeys.getInt(ID);
+//                    parrot.setId(generatedId);
+//                    return parrot;
+//                }
 //            }
-
-            return parrot;
+//            throw new RuntimeException("Failed to retrieve generated ID after insert.");
+            //-------------------------
 
         } catch (Exception e) {
             throw new RuntimeException(e);
